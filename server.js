@@ -35,8 +35,23 @@ db.once("open", function() {
 });
 
 //index
-app.get('/', function(req, res) {
-    res.redirect('/articles');
+app.get("/", function(req, res) {
+  Article.find({"saved": false}, function(error, data) {
+    var hbsObject = {
+      article: data
+    };
+    console.log(hbsObject);
+    res.render("index", hbsObject);
+  });
+});
+
+app.get("/saved", function(req, res) {
+  Article.find({"saved": true}).populate("comments").exec(function(error, articles) {
+    var hbsObject = {
+      article: articles
+    };
+    res.render("article", hbsObject);
+  });
 });
 
 // A GET request to scrape the Verge website
@@ -153,8 +168,7 @@ app.post('/comments/save/:id', function(req, res) {
     } else {
       Article.findOne(
         {"_id": req.params.id},
-        {$push: {"comment": comment} },
-        {new: true})
+        {$push: {"comments": comment} })
       //execute everything
       .exec(function(err, doc) {
         if (err) {
@@ -169,14 +183,22 @@ app.post('/comments/save/:id', function(req, res) {
 });
 //deletes comments
 app.delete("/comments/delete/:comment_id/:article_id", function(req, res) {
-	Comment.findOneAndRemove({"_id": req.params.article_id}, {$pull: {"comments": req.params.comment_id}})
-	.exec(function(err) {
-		if (err) {
-			res.send(err);
-		} else {
-			res.send("Comment has been deleted.");
-		}
-	});
+	Comment.findOneAndRemove({"_id": req.params.article_id}, function(err) {
+    if (err) {
+      res.send(err);
+    } else {
+      Article.findOneAndUpdate(
+        { "_id": req.params.article_id }, 
+        {$pull: {"comments": req.params.comment_id}})
+	   .exec(function(err) {
+		    if (err) {
+			   res.send(err);
+		    } else {
+			   res.send("Comment has been deleted.");
+		    }
+    	});
+    }
+  });
 });
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

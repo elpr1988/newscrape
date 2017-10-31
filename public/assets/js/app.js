@@ -1,4 +1,4 @@
-("#save").on("click", function() {
+$(".save").on("click", function() {
     var thisId = $(this).attr("data-id");
     $.ajax({
         method: "POST",
@@ -6,6 +6,7 @@
     }).done(function(data) {
         window.location = "/"
     })
+    console.log(this)
 });
 
 $(".delete").on("click", function() {
@@ -18,37 +19,37 @@ $(".delete").on("click", function() {
     })
 });
 
-$(".saveNote").on("click", function() {
+$(".saveComment").on("click", function() {
     var thisId = $(this).attr("data-id");
-    if (!$("#noteText" + thisId).val()) {
-        alert("please enter a note to save")
+    if (!$("#commentText" + thisId).val()) {
+        alert("please enter a comment to save")
     }else {
       $.ajax({
             method: "POST",
-            url: "/notes/save/" + thisId,
+            url: "/comments/save/" + thisId,
             data: {
-              text: $("#noteText" + thisId).val()
+              text: $("#commentText" + thisId).val()
             }
           }).done(function(data) {
              
               console.log(data);
        
-              $("#noteText" + thisId).val("");
-              $(".modalNote").modal("hide");
+              $("#commentText" + thisId).val("");
+              $(".modal").modal("hide");
               window.location = "/saved"
           });
         }
     });
 
-$(".deleteNote").on("click", function() {
-    var noteId = $(this).attr("data-note-id");
+$(".deleteComment").on("click", function() {
+    var commentId = $(this).attr("data-comment-id");
     var articleId = $(this).attr("data-article-id");
     $.ajax({
         method: "DELETE",
-        url: "/notes/delete/" + noteId + "/" + articleId
+        url: "/comments/delete/" + commentId + "/" + articleId
     }).done(function(data) {
         console.log(data)
-        $(".modalNote").modal("hide");
+        $(".modal").modal("hide");
         window.location = "/saved"
     })
 });
