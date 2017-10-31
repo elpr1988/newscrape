@@ -1,0 +1,31 @@
+<div>
+  <h1 class="card-panel center-align">Saved the Fake'n News!</h1>
+</div>
+
+<div class="row">
+  <div class="col s2"></div>
+  <div class ="col s8 left-align">
+    {{#if article}}
+      {{#each article}}
+        <div class="card-panel">
+          <h4>{{this.title}}</h4>
+          <div class="row">
+            <p>{{this.summary}}</p>
+            <a href={{this.link}} target="_blank">{{this.link}}</a>
+            <br><br>
+            <button class="waves-effect waves-light btn blue lighten-1" id="addComment" type="button" data-target="#noteModal{{this._id}}" data-id={{this._id}}>Add a Note</button>
+            <button  class="waves-effect waves-light btn red lighten-1" id="delete" type="button" data-id={{this._id}}>Delete</button>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+    <div class="card-panel">
+      <h4>You have no saved articles.</h4>
+    </div>
+  </div>
+</div>
+
+<!--Clicked Notes Modal-->
+{{#each article}}
+  {{> notes-modal }}
+{{/each}}
