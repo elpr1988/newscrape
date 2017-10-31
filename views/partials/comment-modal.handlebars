@@ -1,11 +1,20 @@
-  <!-- Modal Structure -->
-  <div id="commentModal" class="saveComment">
-    <div class="modal-content">
-      <h4>Comments for: {{this.title}}</h4>
-      <p>{{this.comment}}</p>
-    </div>
-    <div class="modal-footer">
-      <a href="" class="modal-action modal-close waves-effect waves-green btn-flat">Save Comment</a>
+<!-- Modal Structure -->
+<div id="addComment" class="modal">
+  <div class="modal-content">
+    <div class="row">
+      <form class="col s12">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="title" type="title" class="validate">
+            <label for="title" data-error="wrong" data-success="right">Add comment for {{this.title}}</label>
+            <input id="body" type="body" class="validate">
+            <label for="body" data-error="wrong" data-success="right">{{this.body}}</label>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
-          
+  <div class="modal-footer">
+    <button type="button" class="saveComment waves-effect waves-light btn blue lighten-1" id="btn" data-id={{this._id}}>Save Comment</button>
+  </div>
+</div>

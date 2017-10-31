@@ -22,7 +22,7 @@ $(".delete").on("click", function() {
 $(".saveComment").on("click", function() {
     var thisId = $(this).attr("data-id");
     if (!$("#commentText" + thisId).val()) {
-        alert("please enter a comment to save")
+        alert("please enter a comment to save");
     }else {
       $.ajax({
             method: "POST",
