@@ -27,7 +27,7 @@ app.engine("handlebars", exphbs({
 
 app.set("view engine", "handlebars");
 
-mongoose.connect("mongodb://localhost/scrapeNews");
+mongoose.connect("mongodb://heroku_5c63m63b:nju5decskeup6kh4hpbda1guts@ds241875.mlab.com:41875/heroku_5c63m63b");
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error"));
 db.once("open", function() {
