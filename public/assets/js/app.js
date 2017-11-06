@@ -4,9 +4,8 @@ $(".save").on("click", function() {
         method: "POST",
         url: "/articles/save/" + thisId
     }).done(function(data) {
-        window.location = "/saved"
+        window.location = "/"
     })
-    console.log(this)
 });
 
 $(".delete").on("click", function() {
@@ -21,9 +20,6 @@ $(".delete").on("click", function() {
 
 $("#addBtn").on("click", function() {
     var thisId = $(this).attr("data-id");
-
-    //pop up a div with the title and comment box with the save comment button
-    console.log("clicked", thisId);
     $.ajax({
         method: "GET",
         url: "/articles/" + thisId
@@ -46,33 +42,33 @@ $("#addBtn").on("click", function() {
     });
 });
 
-$(".saveComment").on("click", function() {
-    var thisId = $(this).attr("data-id");
-    $.ajax({
-        method: "POST",
-        url: "/articles/" + thisId,
-        data: {
-            title: $("#titleinput").val(),
-            body: $("#bodyinput").val()
-        }
-    })
-    .done(function(data) {
-        $("comments").empty();
-    });
-    $("#titleinput").val("");
-    $("#bodyinput").val("");
-});
+// $(".saveComment").on("click", function() {
+//     var thisId = $(this).attr("data-id");
+//     $.ajax({
+//         method: "POST",
+//         url: "/articles/" + thisId,
+//         data: {
+//             title: $("#titleinput").val(),
+//             body: $("#bodyinput").val()
+//         }
+//     })
+//     .done(function(data) {
+//         $("comments").empty();
+//     });
+//     $("#titleinput").val("");
+//     $("#bodyinput").val("");
+// });
 
 
-$(".deleteComment").on("click", function() {
-    var commentId = $(this).attr("data-comment-id");
-    var articleId = $(this).attr("data-article-id");
-    $.ajax({
-        method: "DELETE",
-        url: "/comments/delete/" + commentId + "/" + articleId
-    }).done(function(data) {
-        console.log(data)
-        $(".modal").modal("hide");
-        window.location = "/saved"
-    })
-});
+// $(".deleteComment").on("click", function() {
+//     var commentId = $(this).attr("data-comment-id");
+//     var articleId = $(this).attr("data-article-id");
+//     $.ajax({
+//         method: "DELETE",
+//         url: "/comments/delete/" + commentId + "/" + articleId
+//     }).done(function(data) {
+//         console.log(data)
+//         $(".modal").modal("hide");
+//         window.location = "/saved"
+//     })
+// });
