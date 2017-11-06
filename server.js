@@ -16,13 +16,13 @@ var app = express();
 
 app.use(logger("dev"));
 app.use(bodyParser.urlencoded({
-	extended: true }));
+  extended: true }));
 
 app.use(express.static("public"));
 
 var exphbs = require("express-handlebars");
 app.engine("handlebars", exphbs({
-	defaultLayout: "main" 
+  defaultLayout: "main" 
 }));
 
 app.set("view engine", "handlebars");
@@ -31,7 +31,7 @@ mongoose.connect("mongodb://heroku_5c63m63b:nju5decskeup6kh4hpbda1guts@ds241875.
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error"));
 db.once("open", function() {
-	console.log("Connected to Mongoose");
+  console.log("Connected to Mongoose");
 });
 
 //index
@@ -46,7 +46,9 @@ app.get("/", function(req, res) {
 });
 
 app.get("/saved", function(req, res) {
-  Article.find({"saved": true}).populate("comments").exec(function(error, articles) {
+  Article.find({"saved": true})
+  .populate("comments")
+  .exec(function(error, articles) {
     var hbsObject = {
       article: articles
     };
@@ -66,27 +68,27 @@ app.get("/scrape", (req, res) => {
         result.summary = $(element).children("p").text();
 
         if(result.title !== "" && result.link !== "") {
-        	if(titlesArr.indexOf(result.title) == -1) {
-        		titlesArr.push(result.title);
-        		Article.count({title: result.title}, function(err, test) {
-        			if(test == 0) {
-				        var entry = new Article(result);
-				        //save entry to mongodb
-				        entry.save(function(err, doc) {
-				          if (err) {
-				            console.log(err);
-				          } else {
-				            console.log(doc);
-				          }
-				        });
-			        }
-	        	});
-        	} else {
-        		console.log("Article already exists.");
-        	}
-      	} else {
-      		console.log("Not saved to DB; missing data.");
-      	}
+          if(titlesArr.indexOf(result.title) == -1) {
+            titlesArr.push(result.title);
+            Article.count({title: result.title}, function(err, test) {
+              if(test == 0) {
+                var entry = new Article(result);
+                //save entry to mongodb
+                entry.save(function(err, doc) {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    console.log(doc);
+                  }
+                });
+              }
+            });
+          } else {
+            console.log("Article already exists.");
+          }
+        } else {
+          console.log("Not saved to DB; missing data.");
+        }
     });
     // after scrape, redirects to index
     res.redirect('/');
@@ -108,15 +110,38 @@ app.get("/articles", function(req, res) {
 });
 
 app.get("/articles/:id", function(req, res) {
-	Article.findOne({"_id": req.params.id})
-	.populate("comment")
-	.exec(function(error, doc) {
-		if (error) {
-			res.send(error);
-		} else {
-			res.json(doc);
-		}
-	});
+  Article.findOne({"_id": req.params.id})
+  .populate("comment")
+  .exec(function(error, doc) {
+    if (error) {
+      res.send(error);
+    } else {
+      res.json(doc);
+    }
+  });
+});
+
+app.post("/articles/:id", function(req, res) {
+  var newComment = new Comment(req.body);
+  console.log("New Comment is: ", newComment);
+  newComment.save(function(error, doc) {
+    if (error) {
+      res.send(error);
+    } else {
+      Article.findOneAndUpdate(
+        { "_id": req.params.id},
+        { $set: { "comment": doc._id } },
+        { new: true },
+        function(err, newdoc) {
+          if (err) {
+            res.send(err);
+          } else {
+            res.send(newdoc);
+          }
+        }
+      );
+    }
+  });
 });
 
 //clear all articles for testing purposes
@@ -130,75 +155,78 @@ app.get('/clearAll', function(req, res) {
   });
   res.redirect('/articles');
 });
-// saves the articles 
-app.post("/articles/save/:id", function(req, res) {
-	Article.findOneAndUpdate({"_id": req.params.id}, {"saved":true})
-	.exec(function(err, doc) {
-		if (err) {
-			res.send(err);
-		} else {
-			res.send(doc);
-		}
-	});
-});
-// deletes articles
-app.post("/articles/delete/:id", function(req, res) {
-	Article.findOneAndUpdate(
-		{"_id": req.params.id}, 
-		{"saved": false, "comments": []})
-	.exec(function(err, doc) {
-		if (err) {
-			res.send(err);
-		} else {
-			res.send(doc);
-		}
-	});
-});
-// Create a new comment
-app.post('/comments/save/:id', function(req, res) {
-  //using the Comment model, create a new comment
-  var newComment = new Comment({
-  	title: req.params.id,
-  	body: req.body.text
-  });
 
-  newComment.save(function(err, comment) {
-    if (err) {
-      res.send(err);
-    } else {
-      Article.findOne(
-        {"_id": req.params.id},
-        {$push: {"comments": comment} })
-      //execute everything
-      .exec(function(err, doc) {
-        if (err) {
-          res.send(err);
-        } else {
-        	res.send(comment);
-          res.redirect('/comments/:id');
-        }
-      });
-    }
-  });
-});
-//deletes comments
-app.delete("/comments/delete/:comment_id/:article_id", function(req, res) {
-	Comment.findOneAndRemove({"_id": req.params.article_id}, function(err) {
-    if (err) {
-      res.send(err);
-    } else {
-      Article.findOneAndUpdate(
-        { "_id": req.params.article_id }, 
-        {$pull: {"comments": req.params.comment_id}})
-	   .exec(function(err) {
-		    if (err) {
-			   res.send(err);
-		    } else {
-			   res.send("Comment has been deleted.");
-		    }
-    	});
-    }
-  });
-});
+// // saves the articles 
+// app.post("/articles/save/:id", function(req, res) {
+//   Article.findOneAndUpdate({"_id": req.params.id}, {"saved":true})
+//   .exec(function(err, doc) {
+//     if (err) {
+//       res.send(err);
+//     } else {
+//       res.send(doc);
+//     }
+//   });
+// });
+
+// // deletes articles
+// app.post("/articles/delete/:id", function(req, res) {
+//   Article.findOneAndUpdate(
+//     {"_id": req.params.id}, 
+//     {"saved": false, "comments": []})
+//   .exec(function(err, doc) {
+//     if (err) {
+//       res.send(err);
+//     } else {
+//       res.send(doc);
+//     }
+//   });
+// });
+
+// // Create a new comment
+// app.post('/comments/save/:id', function(req, res) {
+//   //using the Comment model, create a new comment
+//   var newComment = new Comment({
+//    title: req.params.id,
+//    body: req.body.text
+//   });
+
+//   newComment.save(function(err, comment) {
+//     if (err) {
+//       res.send(err);
+//     } else {
+//       Article.findOne(
+//         {"_id": req.params.id},
+//         {$push: {"comments": comment} })
+//       //execute everything
+//       .exec(function(err, doc) {
+//         if (err) {
+//           res.send(err);
+//         } else {
+//          res.send(comment);
+//           res.redirect('/comments/:id');
+//         }
+//       });
+//     }
+//   });
+// });
+// //deletes comments
+// app.delete("/comments/delete/:comment_id/:article_id", function(req, res) {
+//  Comment.findOneAndRemove({"_id": req.params.article_id}, function(err) {
+//     if (err) {
+//       res.send(err);
+//     } else {
+//       Article.findOneAndUpdate(
+//         { "_id": req.params.article_id }, 
+//         {$pull: {"comments": req.params.comment_id}})
+//     .exec(function(err) {
+//        if (err) {
+//         res.send(err);
+//        } else {
+//         res.send("Comment has been deleted.");
+//        }
+//      });
+//     }
+//   });
+// });
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

@@ -4,7 +4,7 @@ $(".save").on("click", function() {
         method: "POST",
         url: "/articles/save/" + thisId
     }).done(function(data) {
-        window.location = "/"
+        window.location = "/saved"
     })
     console.log(this)
 });
@@ -19,27 +19,50 @@ $(".delete").on("click", function() {
     })
 });
 
-$(".saveComment").on("click", function() {
+$("#addBtn").on("click", function() {
     var thisId = $(this).attr("data-id");
-    if (!$("#commentText" + thisId).val()) {
-        alert("please enter a comment to save");
-    }else {
-      $.ajax({
-            method: "POST",
-            url: "/comments/save/" + thisId,
-            data: {
-              text: $("#commentText" + thisId).val()
-            }
-          }).done(function(data) {
-             
-              console.log(data);
-       
-              $("#commentText" + thisId).val("");
-              $(".modal").modal("hide");
-              window.location = "/saved"
-          });
+
+    //pop up a div with the title and comment box with the save comment button
+    console.log("clicked", thisId);
+    $.ajax({
+        method: "GET",
+        url: "/articles/" + thisId
+    })
+    .done(function(data) {
+        console.log("Data: ", data);
+        $("#comments").append(
+            "<div class='col s6 right-align'>" +
+            "<div class='card-panel'>" +
+            "<h4>" + data.title + "</h4>" +
+            "<input id='titleinput' name='title' >" +
+            "<textarea id='bodyinput' name='body'></textarea>" +
+            "<button type='button' class='addComment waves-effect waves-light btn blue lighten-1' id='addComment' data-id='" + data._id + "'>Save Comment</button>" +
+            "<button type='button' class='deleteComment waves-effect waves-light btn blue lighten-1' id='addComment' data-id='" + data._id + "'>Delete Comment</button>");
+
+        if (data.comments) {
+            $("#titleinput").val(data.comments.title);
+            $("#bodyinput").val(data.comments.body);
         }
     });
+});
+
+$(".saveComment").on("click", function() {
+    var thisId = $(this).attr("data-id");
+    $.ajax({
+        method: "POST",
+        url: "/articles/" + thisId,
+        data: {
+            title: $("#titleinput").val(),
+            body: $("#bodyinput").val()
+        }
+    })
+    .done(function(data) {
+        $("comments").empty();
+    });
+    $("#titleinput").val("");
+    $("#bodyinput").val("");
+});
+
 
 $(".deleteComment").on("click", function() {
     var commentId = $(this).attr("data-comment-id");

@@ -9,25 +9,11 @@
         <h4>{{this.title}}</h4>
         <p>{{this.summary}}</p>
         <div class="left-align">
-          <button type="button" class="waves-effect waves-light btn blue lighten-1" id="btn" data-target="addComment" data-id={{this._id}}>Add Comment</button>
+          <button type="button" class="waves-effect waves-light btn blue lighten-1" id="addBtn" data-target="addComment" data-id={{this._id}}>Add Comment</button>
           <button type="button" class="delete waves-effect waves-light btn red lighten-1" id="btn" data-id={{this._id}}>Delete from Saved</button>
         </div>
       </div>
     {{/each}}
   </div>
-    <div class ="col s6 right-align">
-    {{#each article}}
-      <div class="card-panel">
-        <h4>Comments for {{this.title}}</h4>
-        <p>This is where the comments should be displayed {{this.comments}}</p>
-        <div class="right-align">
-          <button type="button" class="deleteComment waves-effect waves-light btn red lighten-1" id="btn" data-id={{this._id}}>Delete Comment</button>
-        </div>
-      </div>
-    {{/each}}
-  </div>
+    <div id="comments"></div>
 </div>
-
-{{#each article}}
-    {{> comment-modal }}
-{{/each}}
